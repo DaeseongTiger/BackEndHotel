@@ -1,0 +1,6 @@
+@ForMiraiProject_HostAddress = http://localhost:5151
+
+GET {{ForMiraiProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
