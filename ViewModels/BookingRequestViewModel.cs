@@ -9,6 +9,8 @@ namespace ForMiraiProject.ViewModels
         [Required(ErrorMessage = "User ID is required.")]
         public Guid UserId { get; set; }
 
+        public string CustomerName { get; set; }
+
         [Required(ErrorMessage = "Room ID is required.")]
         public Guid RoomId { get; set; }
 
@@ -32,6 +34,11 @@ namespace ForMiraiProject.ViewModels
                     new[] { nameof(EndDate) });
             }
         }
+
+        public BookingRequestViewModel(string customerName)
+    {
+        CustomerName = customerName ?? throw new ArgumentNullException(nameof(customerName));
+    }
     } }
 
 

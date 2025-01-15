@@ -180,7 +180,8 @@ namespace ForMiraiProject.Repositories
                 {
                     UserId = userId,
                     CouponId = coupon.Id,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    
                 };
 
                 await _context.Bookings.AddAsync(booking);
@@ -211,5 +212,85 @@ namespace ForMiraiProject.Repositories
             if (coupon.ExpiryDate <= DateTime.UtcNow)
                 throw new ArgumentException("Expiry date must be in the future.", nameof(coupon.ExpiryDate));
         }
+
+        public async Task<IEnumerable<Coupon>> GetAllAsync()
+{
+    try
+    {
+        return await _context.Coupons
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error fetching all coupons.");
+        throw new InvalidOperationException("An error occurred while retrieving all coupons.", ex);
+    }
+}
+
+public async Task CreateAsync(Coupon coupon)
+{
+    if (coupon == null)
+        throw new ArgumentNullException(nameof(coupon));
+
+    try
+    {
+        _context.Coupons.Add(coupon);
+        await _context.SaveChangesAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error creating coupon.");
+        throw new InvalidOperationException("An error occurred while creating the coupon.", ex);
+    }
+}
+
+
+
+
+public async Task<Coupon?> GetByCodeAsync(string code)
+{
+    if (string.IsNullOrWhiteSpace(code))
+        throw new ArgumentException("Coupon code cannot be empty", nameof(code));
+
+    try
+    {
+        return await _context.Coupons
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower());
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error fetching coupon by code {Code}.", code);
+        throw new InvalidOperationException("An error occurred while retrieving the coupon.", ex);
+    }
+}
+
+
+
+public async Task<Coupon> UpdateAsync(Guid id, Coupon updatedCoupon, CancellationToken cancellationToken)
+{
+    var existingCoupon = await _context.Coupons.FindAsync(id);
+
+    if (existingCoupon == null)
+    {
+        throw new KeyNotFoundException("Coupon not found.");
+    }
+
+    existingCoupon.Code = updatedCoupon.Code;
+    existingCoupon.DiscountAmount = updatedCoupon.DiscountAmount;
+    existingCoupon.ExpirationDate = updatedCoupon.ExpirationDate;
+    existingCoupon.IsUsed = updatedCoupon.IsUsed;
+
+    await _context.SaveChangesAsync(cancellationToken);
+
+    // คืนค่าคูปองที่อัปเดตแล้ว
+    return existingCoupon;
+}
+
+
+
+
+
     }
 }

@@ -9,6 +9,12 @@ namespace ForMiraiProject.Repositories.Interfaces
 {
     Task<IEnumerable<Review>> GetReviewsByHotelIdAsync(Guid hotelId);    // ดึงรีวิวตามโรงแรม
     Task<Review?> GetReviewByUserAsync(Guid userId, Guid hotelId);        // ดึงรีวิวของผู้ใช้ที่โรงแรม
-    Task<bool> IsReviewExistsAsync(Guid userId, Guid hotelId);           // ตรวจสอบว่าผู้ใช้รีวิวโรงแรมนี้แล้ว
+    Task<bool> IsReviewExistsAsync(Guid userId, Guid hotelId);   
+
+    Task DeleteReviewAsync(Guid reviewId);
+    
+    Task CreateReviewAsync(Review review);
+    
+    Task UpdateReviewAsync(Review review);         // ตรวจสอบว่าผู้ใช้รีวิวโรงแรมนี้แล้ว
 }
 }

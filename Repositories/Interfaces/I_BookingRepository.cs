@@ -19,6 +19,8 @@ namespace ForMiraiProject.Repositories.Interfaces
 
         Task<IEnumerable<Booking>> GetBookingsByUserAsync(Guid userId);
 
+         public Task DeleteBookingAsync(Guid bookingId) ;
+
 
         
     }

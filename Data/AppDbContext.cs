@@ -26,7 +26,7 @@ namespace ForMiraiProject.Data
         public DbSet<Feedback> Feedbacks { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
 
-        
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

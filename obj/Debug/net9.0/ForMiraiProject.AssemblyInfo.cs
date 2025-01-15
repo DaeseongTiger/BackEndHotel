@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ForMiraiProject")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a00e79ec1201543e7d830da4348fc0f592298e9")]
 [assembly: System.Reflection.AssemblyProductAttribute("ForMiraiProject")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ForMiraiProject")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -308,6 +308,21 @@ public async Task<IEnumerable<Booking>> GetBookingsByUserAsync(Guid userId)
     }
 }
 
+public async Task DeleteBookingAsync(Guid bookingId)
+        {
+            // ค้นหาการจองที่ต้องการลบ
+            var booking = await _context.Bookings.FindAsync(bookingId);
+            if (booking != null)
+            {
+                _context.Bookings.Remove(booking);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentException("Booking not found.");
+            }
+        }
+
 
     }
 }

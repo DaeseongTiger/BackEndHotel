@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using ForMiraiProject.Repositories.Interfaces;
 using ForMiraiProject.Services.Interfaces;
 using ForMiraiProject.Utilities.PagedResult;
+using ForMiraiProject.Data;
 
 namespace ForMiraiProject.Services
 {
@@ -17,15 +18,13 @@ namespace ForMiraiProject.Services
         private readonly I_BookingRepository _bookingRepository;
         private readonly ILogger<BookingService> _logger;
 
-        
+        public required AppDbContext _dbContext;
 
         public BookingService(I_BookingRepository bookingRepository, ILogger<BookingService> logger)
         {
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        
 
         public async Task<OperationResultCollect> CreateBookingAsync(BookingRequestViewModel bookingRequest)
         {
@@ -34,12 +33,10 @@ namespace ForMiraiProject.Services
 
             try
             {
-                // Validate room availability
                 var isRoomAvailable = await CheckRoomAvailabilityAsync(bookingRequest.RoomId, bookingRequest.StartDate, bookingRequest.EndDate);
                 if (!isRoomAvailable)
                     return OperationResultCollect.Failure("Room is not available for the requested dates.");
 
-                // Create new booking
                 var newBooking = new Booking
                 {
                     UserId = bookingRequest.UserId,
@@ -48,7 +45,8 @@ namespace ForMiraiProject.Services
                     EndDate = bookingRequest.EndDate,
                     SpecialRequests = bookingRequest.SpecialRequests ?? string.Empty,
                     BookingStatus = "Pending",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    CustomerName = bookingRequest.CustomerName // กำหนดค่าของ CustomerName
                 };
 
                 await _bookingRepository.AddAsync(newBooking);
@@ -85,18 +83,28 @@ namespace ForMiraiProject.Services
             }
         }
 
-        public async Task<BookingResponseViewModel?> GetBookingByIdAsync(Guid bookingId)
+        public async Task<Booking?> GetBookingByIdAsync(Guid bookingId)
+{
+    if (bookingId == Guid.Empty)
+    {
+        return null;
+    }
+
+    var booking = await _dbContext.Bookings.FindAsync(bookingId);
+    return booking;
+}
+
+        public async Task<PagedResultBase<BookingResponseViewModel>> GetPagedBookingsAsync(int pageIndex, int pageSize)
         {
-            if (bookingId == Guid.Empty)
-                return null;
+            if (pageIndex < 0 || pageSize <= 0)
+                throw new ArgumentException("Invalid pagination parameters.");
 
             try
             {
-                var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
-                if (booking == null)
-                    return null;
+                var bookings = await _bookingRepository.GetPagedBookingsAsync(pageIndex, pageSize);
+                var totalBookings = await _bookingRepository.GetTotalBookingCountAsync();
 
-                return new BookingResponseViewModel
+                var bookingViewModels = bookings.Select(booking => new BookingResponseViewModel
                 {
                     BookingId = booking.Id,
                     RoomId = booking.RoomId,
@@ -105,48 +113,18 @@ namespace ForMiraiProject.Services
                     EndDate = booking.EndDate,
                     SpecialRequests = booking.SpecialRequests,
                     BookingStatus = booking.BookingStatus
-                };
+                });
+
+                return PagedResultBase<BookingResponseViewModel>.Create(
+                    bookingViewModels, totalBookings, pageIndex, pageSize
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving booking details.");
-                return null;
+                _logger.LogError(ex, "An error occurred while fetching paged bookings.");
+                throw;
             }
         }
-
-        public async Task<PagedResultBase<BookingResponseViewModel>> GetPagedBookingsAsync(int pageIndex, int pageSize)
-{
-    if (pageIndex < 0 || pageSize <= 0)
-        throw new ArgumentException("Invalid pagination parameters.");
-
-    try
-    {
-        // ดึงข้อมูล Booking
-        var bookings = await _bookingRepository.GetPagedBookingsAsync(pageIndex, pageSize);
-        var totalBookings = await _bookingRepository.GetTotalBookingCountAsync();
-
-        // แปลง Booking เป็น BookingResponseViewModel
-        var bookingViewModels = bookings.Select(booking => new BookingResponseViewModel
-        {
-            BookingId = booking.Id,
-            RoomId = booking.RoomId,
-            UserId = booking.UserId,
-            StartDate = booking.StartDate,
-            EndDate = booking.EndDate,
-            SpecialRequests = booking.SpecialRequests,
-            BookingStatus = booking.BookingStatus
-        });
-
-        return PagedResultBase<BookingResponseViewModel>.Create(
-            bookingViewModels, totalBookings, pageIndex, pageSize
-        );
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "An error occurred while fetching paged bookings.");
-        throw; // ให้โยนข้อผิดพลาดออกไปเพื่อจัดการในระดับสูงขึ้น
-    }
-}
 
         public async Task<IEnumerable<BookingResponseViewModel>> GetBookingsByUserAsync(Guid userId)
         {
@@ -205,5 +183,60 @@ namespace ForMiraiProject.Services
                 return OperationResultCollect.Failure("An error occurred while updating booking status.");
             }
         }
+
+        public async Task DeleteBookingAsync(Booking booking)
+{
+    if (booking == null)
+        throw new ArgumentNullException(nameof(booking), "Booking cannot be null");
+
+    try
+    {
+        // ส่ง booking.Id (Guid) แทนการส่ง booking ทั้งหมด
+        await _bookingRepository.DeleteBookingAsync(booking.Id);  
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while deleting the booking.");
+        throw;
+    }
+}
+
+public BookingService(AppDbContext dbContext, I_BookingRepository bookingRepository, ILogger<BookingService> logger)
+{
+    _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
+    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+}
+
+
+
+     public async Task<bool> DeleteBookingAsync(Guid bookingId)
+{
+    if (bookingId == Guid.Empty)
+        return false;  // คืนค่าผลลัพธ์เมื่อ bookingId เป็นค่าไม่ถูกต้อง
+
+    try
+    {
+        var booking = await _dbContext.Bookings.FindAsync(bookingId);
+        if (booking == null)
+            return false;  // คืนค่าผลลัพธ์เมื่อไม่พบ booking
+
+        _dbContext.Bookings.Remove(booking);
+        await _dbContext.SaveChangesAsync();
+
+        return true;  // คืนค่าผลลัพธ์เมื่อการลบสำเร็จ
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while deleting the booking.");
+        return false;  // คืนค่าผลลัพธ์เมื่อเกิดข้อผิดพลาด
+    }
+}
+
+
+ 
+
+
+
     }
 }

@@ -14,7 +14,9 @@ namespace ForMiraiProject.Models
 
         [Required]
         [MaxLength(20, ErrorMessage = "Code cannot exceed 20 characters.")]
-        public string Code { get; set; } = string.Empty; // Coupon Code
+        public string Code { get; set; } = string.Empty;
+        
+         // Coupon Code
 
         [Required]
         [Range(0, 100, ErrorMessage = "Discount percentage must be between 0 and 100.")]
@@ -34,20 +36,34 @@ namespace ForMiraiProject.Models
         [MaxLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string Description { get; set; } = string.Empty; // Description
 
-        public ICollection<Guid> RestrictedUserIds { get; set; } = new List<Guid>(); // Restricted users
+        public ICollection<User> RestrictedUsers { get; set; } = new List<User>(); // Restricted users
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Creation timestamp
 
         [Required]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // Update timestamp
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        
+        public DateTime ExpirationDate { get; set; } // Update timestamp
 
-        // Method to check if coupon is expired
-        public bool IsExpired() => DateTime.UtcNow > ExpiryDate;
+        public bool IsUsed { get; set; } // หรืออาจจะเป็นฟังก์ชันที่คอยตรวจสอบ
+        public decimal DiscountAmount { get; set; }
+
+        public List<Guid> RestrictedUserIds { get; set; }
+
+        public bool IsExpired => DateTime.Now > ExpiryDate;
+
+        // Method to check if coupon is expired or inactive
+        public bool IsExpiredOrInactive() 
+        {
+            return !IsActive || DateTime.UtcNow > ExpiryDate;
+        }
 
         // Method to deactivate coupon
         public void Deactivate()
         {
+            if (!IsActive) return; // Avoid unnecessary updates
+
             IsActive = false;
             UpdatedAt = DateTime.UtcNow;
         }
@@ -55,6 +71,14 @@ namespace ForMiraiProject.Models
         // Validate and update coupon details
         public void UpdateDetails(string code, decimal discountPercentage, decimal maxDiscountAmount, DateTime expiryDate, string description)
         {
+            if (Code == code && DiscountPercentage == discountPercentage &&
+                MaxDiscountAmount == maxDiscountAmount && ExpiryDate == expiryDate && 
+                Description == description)
+            {
+                // No changes detected
+                return;
+            }
+
             ValidateCouponInput(code, discountPercentage, maxDiscountAmount, expiryDate);
 
             Code = WebUtility.HtmlEncode(code); // Prevent XSS
@@ -88,6 +112,7 @@ namespace ForMiraiProject.Models
         }
 
         // Default Constructor for EF Core
-        public Coupon() { }
     }
+
+    // Example User class for RestrictedUsers relationsh
 }

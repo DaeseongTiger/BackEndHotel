@@ -132,5 +132,58 @@ public async Task<Review?> GetReviewByUserAsync(Guid userId, Guid hotelId)
                 throw;
             }
         }
+
+        public async Task CreateReviewAsync(Review review)
+{
+    // ตรวจสอบก่อนว่ารีวิวนี้มีอยู่แล้วหรือไม่ (optional step)
+    var existingReview = await _context.Reviews
+                                       .FirstOrDefaultAsync(r => r.HotelId == review.HotelId && r.UserId == review.UserId);
+
+    if (existingReview != null)
+    {
+        throw new InvalidOperationException("The user has already reviewed this hotel.");
+    }
+
+    // เพิ่มรีวิวใหม่ลงในฐานข้อมูล
+    await _context.Reviews.AddAsync(review);
+    await _context.SaveChangesAsync();
+}
+
+public async Task DeleteReviewAsync(Guid reviewId)
+{
+    // ค้นหาผ่าน ReviewId เพื่อหาว่ารีวิวที่ต้องการลบมีอยู่ในฐานข้อมูลหรือไม่
+    var review = await _context.Reviews.FindAsync(reviewId);
+
+    if (review == null)
+    {
+        throw new KeyNotFoundException("Review not found.");
+    }
+
+    // ลบรีวิวจากฐานข้อมูล
+    _context.Reviews.Remove(review);
+    await _context.SaveChangesAsync();
+}
+
+
+public async Task UpdateReviewAsync(Review review)
+{
+    // ค้นหารีวิวที่ต้องการอัปเดต
+    var existingReview = await _context.Reviews.FindAsync(review.Id);
+
+    if (existingReview == null)
+    {
+        throw new KeyNotFoundException("Review not found.");
+    }
+
+    // อัปเดตข้อมูลของรีวิว
+    existingReview.Rating = review.Rating;
+    existingReview.Comment = review.Comment;
+    existingReview.UpdatedAt = DateTime.UtcNow;
+
+    // บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+    _context.Reviews.Update(existingReview);
+    await _context.SaveChangesAsync();
+}
+
     }
 }

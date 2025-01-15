@@ -88,8 +88,10 @@ builder.Services.AddScoped<I_FeedbackService, FeedbackService>(); // เพิ�
 builder.Services.AddScoped<I_FeedbackRepository, FeedbackRepository>(); // เพิ่ม FeedbackRepository
 builder.Services.AddScoped<I_HotelRepository, HotelRepository>();
 builder.Services.AddScoped<I_UserRepository, UserRepository>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddScoped<I_AuthService, AuthService>();
 
 
 // CORS Policy

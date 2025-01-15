@@ -46,12 +46,23 @@ namespace ForMiraiProject.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Booking creation date
 
         [Required]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // Last updated date
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; 
+        
+        public string? UserName { get; set; } // Last updated date
 
         public DateTime StartDate { get; set; } // วันที่เริ่มต้นของการจอง
         public DateTime EndDate { get; set; }
 
         public string BookingStatus { get; set; } = "Pending";
+        public DateTime ExpiryDate { get; set; }
+
+        public  string? CustomerName { get; set; }
+        public DateTime BookingDate { get; set; }
+
+
+
+
+        
 
         // Default constructor for EF Core
         public Booking()
@@ -108,15 +119,19 @@ namespace ForMiraiProject.Models
         // Apply coupon to booking
         public void ApplyCoupon(Coupon coupon)
         {
-            if (coupon == null || coupon.IsExpired() || !coupon.IsActive)
+            if (coupon != null && coupon.IsExpired && coupon.IsActive)
+            {
+                CouponId = coupon.Id;
+                Coupon = coupon;
+
+                var discountAmount = TotalAmount * (coupon.DiscountPercentage / 100);
+                TotalAmount -= Math.Min(discountAmount, coupon.MaxDiscountAmount);
+                UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
                 throw new InvalidOperationException("The provided coupon is invalid or expired.");
-
-            CouponId = coupon.Id;
-            Coupon = coupon;
-
-            var discountAmount = TotalAmount * (coupon.DiscountPercentage / 100);
-            TotalAmount -= Math.Min(discountAmount, coupon.MaxDiscountAmount);
-            UpdatedAt = DateTime.UtcNow;
+            }
         }
     }
 }

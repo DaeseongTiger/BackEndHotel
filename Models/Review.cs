@@ -34,6 +34,8 @@ namespace ForMiraiProject.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Review creation time
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // Last updated time
 
+        public required string Content { get; set; } 
+
         // Constructor to set Comment content and encode to prevent XSS
         public void SetComment(string comment)
         {

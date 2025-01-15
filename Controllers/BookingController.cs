@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ForMiraiProject.Services.Interfaces;
-using ForMiraiProject.ViewModels;
-using ForMiraiProject.Utilities;
 using System;
 using System.Threading.Tasks;
+using ForMiraiProject.Models;
+using ForMiraiProject.Services.Interfaces;
+using ForMiraiProject.ViewModels;
+using ForMiraiProject.DTOs; 
 
 namespace ForMiraiProject.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
     public class BookingController : ControllerBase
     {
         private readonly I_BookingService _bookingService;
@@ -18,148 +20,101 @@ namespace ForMiraiProject.Controllers
 
         public BookingController(I_BookingService bookingService, ILogger<BookingController> logger)
         {
-            _bookingService = bookingService ?? throw new ArgumentNullException(nameof(bookingService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _bookingService = bookingService;
+            _logger = logger;
         }
 
-        /// <summary>
-        /// Create a new booking.
-        /// </summary>
-        /// <param name="bookingRequest">Booking details.</param>
-        /// <returns>Operation result with booking information.</returns>
-        [HttpPost("create")]
-        [Authorize]  // Requires authentication
-        public async Task<IActionResult> CreateBooking([FromBody] BookingRequestViewModel bookingRequest)
+        // สร้างการจองใหม่
+        [HttpPost]
+        [Route("create")]
+        public async Task<IActionResult> CreateBookingAsync([FromBody] Booking booking)
         {
-            if (!ModelState.IsValid)
+            if (booking == null)
             {
-                _logger.LogWarning("Invalid booking request.");
-                return BadRequest(ModelState);
+                _logger.LogWarning("Invalid booking attempt: booking object is null.");
+                return BadRequest("Booking details cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(booking.UserName) || booking.CheckInDate == default)
+            {
+                return BadRequest("Invalid booking data provided.");
             }
 
             try
+            {
+                var bookingRequestViewModel = new BookingRequestViewModel(booking.UserName)
 {
-    var result = await _bookingService.CreateBookingAsync(bookingRequest);
-    if (result.IsSuccess)
+    UserId = booking.UserId,
+    RoomId = booking.RoomId,
+    StartDate = booking.CheckInDate,
+    EndDate = booking.CheckOutDate,
+    SpecialRequests = booking.SpecialRequests
+};
+
+                await _bookingService.CreateBookingAsync(bookingRequestViewModel);
+                
+                return Ok(new { Message = "Booking successfully created" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating the booking.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
+
+        // ดูข้อมูลการจอง
+        [HttpGet]
+[Route("details/{bookingId}")]
+public async Task<IActionResult> GetBookingDetailsAsync(Guid bookingId)
+{
+    if (bookingId == Guid.Empty)
     {
-        return CreatedAtAction(nameof(GetBookingById), new { bookingId = result.ResultData }, result); // ใช้ ResultData แทน Data
+        return BadRequest("Invalid booking ID.");
     }
-    return BadRequest(new { Message = result.Message });
-}
-catch (Exception ex)
-{
-    _logger.LogError(ex, "Error occurred while creating booking.");
-    return StatusCode(500, new { Message = "Internal server error." });
-}
-        }
 
-        /// <summary>
-        /// Get a booking by ID.
-        /// </summary>
-        /// <param name="bookingId">Booking ID</param>
-        /// <returns>Booking details.</returns>
-        [HttpGet("{bookingId}")]
-        [Authorize]  // Requires authentication
-        public async Task<IActionResult> GetBookingById(Guid bookingId)
-        {
-            try
-            {
-                var booking = await _bookingService.GetBookingByIdAsync(bookingId);
-                if (booking == null)
-                {
-                    _logger.LogWarning("Booking not found for ID: {BookingId}", bookingId);
-                    return NotFound(new { Message = "Booking not found." });
-                }
-                return Ok(booking);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while fetching booking details.");
-                return StatusCode(500, new { Message = "Internal server error." });
-            }
-        }
-
-        /// <summary>
-        /// Cancel a booking.
-        /// </summary>
-        /// <param name="bookingId">Booking ID</param>
-        /// <returns>Operation result.</returns>
-        [HttpDelete("cancel/{bookingId}")]
-        [Authorize]  // Requires authentication
-        public async Task<IActionResult> CancelBooking(Guid bookingId)
-        {
-            try
-            {
-                var result = await _bookingService.CancelBookingAsync(bookingId);
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(new { Message = result.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while canceling booking.");
-                return StatusCode(500, new { Message = "Internal server error." });
-            }
-        }
-
-        /// <summary>
-        /// Get all bookings for a user.
-        /// </summary>
-        /// <param name="userId">User ID</param>
-        /// <returns>List of bookings.</returns>
-        [HttpGet("user/{userId}")]
-        [Authorize]  // Requires authentication
-        public async Task<IActionResult> GetBookingsByUser(Guid userId)
-{
     try
     {
-        var bookings = await _bookingService.GetBookingsByUserAsync(userId);
-        if (bookings == null || !bookings.Any())
+        var booking = await _bookingService.GetBookingByIdAsync(bookingId); // ใช้ Guid
+        if (booking == null)
         {
-            _logger.LogWarning("No bookings found for user ID: {UserId}", userId);
-            return NotFound(new { Message = "No bookings found." });
+            return NotFound("Booking not found.");
         }
-        return Ok(bookings);
+
+        return Ok(booking);
     }
     catch (Exception ex)
     {
-        _logger.LogError(ex, "Error occurred while fetching bookings for user.");
-        return StatusCode(500, new { Message = "Internal server error." });
+        _logger.LogError(ex, $"Error occurred while fetching booking details for ID: {bookingId}");
+        return StatusCode(500, "Internal server error.");
     }
 }
 
 
-
-        /// <summary>
-        /// Update the booking status.
-        /// </summary>
-        /// <param name="bookingId">Booking ID</param>
-        /// <param name="status">New status</param>
-        /// <returns>Operation result.</returns>
-        [HttpPut("update-status/{bookingId}")]
-        [Authorize]  // Requires authentication
-        public async Task<IActionResult> UpdateBookingStatus(Guid bookingId, [FromBody] string status)
+        // ลบการจอง
+        [HttpDelete]
+        [Route("delete/{bookingId}")]
+        public async Task<IActionResult> DeleteBookingAsync(Guid bookingId)
         {
-            if (string.IsNullOrEmpty(status))
+            if (bookingId == Guid.Empty)
             {
-                return BadRequest(new { Message = "Status is required." });
+                return BadRequest("Invalid booking ID.");
             }
 
             try
             {
-                var result = await _bookingService.UpdateBookingStatusAsync(bookingId, status);
-                if (result.IsSuccess)
+                var result = await _bookingService.DeleteBookingAsync(bookingId);
+                if (result)
                 {
-                    return Ok(result);
+                    _logger.LogInformation($"Booking with ID: {bookingId} has been successfully deleted.");
+                    return Ok(new { Message = "Booking deleted successfully." });
                 }
-                return BadRequest(new { Message = result.Message });
+
+                return NotFound("Booking not found.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while updating booking status.");
-                return StatusCode(500, new { Message = "Internal server error." });
+                _logger.LogError(ex, $"Error occurred while deleting booking with ID: {bookingId}");
+                return StatusCode(500, "Internal server error.");
             }
         }
     }

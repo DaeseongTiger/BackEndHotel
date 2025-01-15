@@ -188,5 +188,39 @@ namespace ForMiraiProject.Repositories
             }
             return Convert.ToBase64String(randomBytes);
         }
+
+         public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+    {
+        // ตรวจสอบว่า refreshToken เป็นค่า null หรือว่างหรือไม่
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return null;
+        }
+
+        // ค้นหาผู้ใช้ในฐานข้อมูลที่มีค่า refreshToken ตรงกับที่ระบุ
+        var user = await _context.Users
+                                  .Where(u => u.RefreshToken == refreshToken)
+                                  .FirstOrDefaultAsync();
+
+        // ส่งค่าผลลัพธ์กลับ
+        return user;
+    }
+
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        // ตรวจสอบว่า email เป็นค่า null หรือว่างหรือไม่
+        if (string.IsNullOrEmpty(email))
+        {
+            return null;
+        }
+
+        // ค้นหาผู้ใช้ในฐานข้อมูลที่มีค่า email ตรงกับที่ระบุ
+        var user = await _context.Users
+                                  .Where(u => u.Email == email)
+                                  .FirstOrDefaultAsync();
+
+        // ส่งค่าผลลัพธ์กลับ
+        return user;
+    }
     }
 }

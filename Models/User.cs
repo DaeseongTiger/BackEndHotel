@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ForMiraiProject.Models
 {
@@ -18,6 +19,8 @@ namespace ForMiraiProject.Models
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
         public string FullName { get; set; } = string.Empty;
+
+       
 
         
 

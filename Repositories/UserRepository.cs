@@ -63,25 +63,26 @@ namespace ForMiraiProject.Repositories
         /// ดึงข้อมูลผู้ใช้ตาม ID
         /// </summary>
         public async Task<User?> GetUserByIdAsync(Guid userId)
-        {
-            if (userId == Guid.Empty)
-            {
-                _logger.LogWarning("Invalid user ID provided for retrieval.");
-                throw new ArgumentException("User ID cannot be empty.", nameof(userId));
-            }
+{
+    if (userId == Guid.Empty)
+    {
+        _logger.LogWarning("Invalid user ID provided for retrieval.");
+        throw new ArgumentException("User ID cannot be empty.", nameof(userId));
+    }
 
-            try
-            {
-                return await _context.Users
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Id == userId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while fetching the user by ID: {UserId}", userId);
-                throw;
-            }
-        }
+    try
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId); // ใช้ u.Id เพื่อชี้ชัดเจนว่าเป็นสมาชิกของ User
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while fetching the user by ID: {UserId}", userId);
+        throw;
+    }
+}
+
 
         /// <summary>
         /// ค้นหาผู้ใช้ตามบทบาท

@@ -95,8 +95,6 @@ C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.AspNetCore.StaticFiles.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.AspNetCore.WebSockets.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.AspNetCore.WebUtilities.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.CSharp.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Caching.Abstractions.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Caching.Memory.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.Abstractions.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.Binder.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.CommandLine.dll
@@ -108,8 +106,6 @@ C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.Json
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.KeyPerFile.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.UserSecrets.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Configuration.Xml.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.DependencyInjection.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Diagnostics.Abstractions.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Diagnostics.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
@@ -127,19 +123,15 @@ C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Identity.Core.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Identity.Stores.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Localization.Abstractions.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Localization.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.Abstractions.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.Configuration.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.Console.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.Debug.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.EventLog.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.EventSource.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Logging.TraceSource.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.ObjectPool.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Options.DataAnnotations.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Options.dll
-C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.Primitives.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Extensions.WebEncoders.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.JSInterop.dll
 C:\ForMiraiProject\bin\Debug\net9.0\refs\Microsoft.Net.Http.Headers.dll
@@ -456,6 +448,7 @@ C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.AssemblyInfo.cs
 C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.csproj.CoreCompileInputs.cache
 C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.MvcApplicationPartsAssemblyInfo.cs
 C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.MvcApplicationPartsAssemblyInfo.cache
+C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.sourcelink.json
 C:\ForMiraiProject\obj\Debug\net9.0\scopedcss\bundle\ForMiraiProject.styles.css
 C:\ForMiraiProject\obj\Debug\net9.0\staticwebassets.build.json
 C:\ForMiraiProject\obj\Debug\net9.0\staticwebassets.development.json
@@ -472,3 +465,11 @@ C:\ForMiraiProject\obj\Debug\net9.0\refint\ForMiraiProject.dll
 C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.pdb
 C:\ForMiraiProject\obj\Debug\net9.0\ForMiraiProject.genruntimeconfig.cache
 C:\ForMiraiProject\obj\Debug\net9.0\ref\ForMiraiProject.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Caching.Memory.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Logging.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
+C:\ForMiraiProject\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll

@@ -1,10 +1,9 @@
-using ForMiraiProject.Models;
+
 using ForMiraiProject.Repositories.Interfaces;
 using ForMiraiProject.Services.Interfaces;
 using ForMiraiProject.ViewModels;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using UserModel = ForMiraiProject.Models.User;
+
 
 namespace ForMiraiProject.Services
 {
@@ -23,37 +22,38 @@ namespace ForMiraiProject.Services
         /// Gets the profile of the user by their ID.
         /// </summary>
         public async Task<UserProfileViewModel?> GetUserProfileAsync(Guid userId)
+{
+    if (userId == Guid.Empty)
+    {
+        _logger.LogWarning("Invalid user ID provided for profile retrieval.");
+        throw new ArgumentException("User ID cannot be empty.", nameof(userId));
+    }
+
+    try
+    {
+        // ดึงข้อมูล user จาก repository
+        var User = await _userRepository.GetUserByIdAsync(userId);
+        if (User == null)
         {
-            if (userId == Guid.Empty)
-            {
-                _logger.LogWarning("Invalid user ID provided for profile retrieval.");
-                throw new ArgumentException("User ID cannot be empty.", nameof(userId));
-            }
-
-            try
-            {
-                var user = await _userRepository.GetUserByIdAsync(userId);
-                if (user == null)
-                {
-                    _logger.LogWarning("User not found for ID: {UserId}", userId);
-                    return null;
-                }
-
-                return new UserProfileViewModel
-                {
-                    UserId = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    DateOfBirth = user.DateOfBirth
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving the user profile for ID: {UserId}", userId);
-                throw;
-            }
+            _logger.LogWarning("User not found for ID: {UserId}", userId);
+            return null;
         }
+
+        return new UserProfileViewModel
+        {
+            UserId = User.Id,
+            FullName = User.FullName,
+            Email = User.Email,
+            PhoneNumber = User.PhoneNumber,
+            DateOfBirth = User.DateOfBirth
+        };
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while retrieving the user profile for ID: {UserId}", userId);
+        throw;
+    }
+}
 
         /// <summary>
         /// Updates the user's profile information.

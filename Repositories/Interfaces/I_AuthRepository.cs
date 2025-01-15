@@ -49,5 +49,9 @@ namespace ForMiraiProject.Repositories.Interfaces
         /// <param name="user">The user object whose session is being cleared.</param>
         /// <returns>True if logout is successful; otherwise, false.</returns>
         Task<bool> LogoutUserAsync(User user);
+        Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
+
+        Task<User?> GetUserByEmailAsync(string email);
+
     }
 }
